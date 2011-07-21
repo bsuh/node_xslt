@@ -1,0 +1,6 @@
+
+Usage:
+
+node_xslt = require('node_xslt')
+
+output = node_xslt.transform(stylesheetString, xmlDocumentString)
