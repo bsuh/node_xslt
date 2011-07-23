@@ -1,8 +1,0 @@
-Requires libxslt1 & libxml2 headers to build
-
-Usage:
-    node_xslt = require('node_xslt')
-    stylesheet = node_xslt.readXsltString(stylesheetString)
-    document = node_xslt.readXmlString(documentString)
-    xmlString = node_xslt.transform(stylesheet, document,
-            ['paramName', 'paramValue', 'paramName2', 5])

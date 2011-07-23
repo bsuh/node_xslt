@@ -1,0 +1,18 @@
+{
+    "name": "node_xslt",
+    "version": "0.1.0",
+    "main": "./build/default/node_xslt",
+    "engines": {
+        "node": ">=0.1.93"
+    },
+    "dependencies": {
+    },
+    "description": "A simple XSLT package for node.js",
+    "author": "Brian Suh <brian.j.suh@gmail.com>",
+    "homepage": "https://github.com/bahblah/node_xslt",
+    "repository":
+    {
+        "type": "git",
+        "url": "git://github.com/bahblah/node_xslt.git"
+    }
+}
