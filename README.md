@@ -16,8 +16,10 @@
 ## Installation
 
 **npm**
+
     npm install node_xslt
 
 **source**
+
     In the root directory, run `node-waf configure build` to generate
     ./build/default/node_xslt.node
