@@ -5,52 +5,70 @@
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
 #include <string.h>
+#include "macros.h"
 #include "scopeguard.h"
+
+#define OBJ_DESTRUCTOR(d) Persistent<Object> _weak_handle = Persistent<Object>::New(self); \
+                          _weak_handle.MakeWeak(NULL, d);
 
 using namespace v8;
 
-Handle<Value> err(const char * msg) {
-    return ThrowException(Exception::Error(String::New(msg)));
+void jsXmlDocCleanup(Persistent<Value> value, void *) {
+    HandleScope handlescope;
+    Local<Object> obj = value->ToObject();
+    EXTERNAL(xmlDocPtr, doc, obj, 0);
+    xmlFreeDoc(doc);
+    return;
 }
 
-xmlDocPtr xmlReadMemory(const char * buffer, int size) {
-    xmlDocPtr doc = xmlReadMemory(buffer, size, NULL, "UTF-8", 0);
+void jsXsltStylesheetCleanup(Persistent<Value> value, void *) {
+    HandleScope handlescope;
+    Local<Object> obj = value->ToObject();
+    EXTERNAL(xsltStylesheetPtr, style, obj, 0);
+    xsltFreeStylesheet(style);
+    return;
+}
+
+OBJECT(jsXmlDoc, 1, xmlDocPtr doc)
+    INTERNAL(0, doc)
+    OBJ_DESTRUCTOR(&jsXmlDocCleanup)
+    RETURN_SCOPED(self);
+END
+
+OBJECT(jsXsltStylesheet, 1, xsltStylesheetPtr style)
+    INTERNAL(0, style)
+    OBJ_DESTRUCTOR(&jsXsltStylesheetCleanup)
+    RETURN_SCOPED(self);
+END
+
+FUNCTION(readXmlString)
+    ARG_COUNT(1)
+    ARG_utf8(str, 0)
+
+    xmlDocPtr doc = xmlReadMemory(*str, str.length(), NULL, "UTF-8", 0);
     if (!doc) {
-        throw err("Failed to parse XML");
+        throw JS_ERROR("Failed to parse XML");
     }
-    return doc;
-}
+    RETURN_SCOPED(jsXmlDoc(doc));
+END
 
-xsltStylesheetPtr xsltReadMemory(const char * buffer, int size) {
-    xmlDocPtr doc = xmlReadMemory(buffer, size, NULL, "UTF-8", 0);
+FUNCTION(readXsltString)
+    ARG_COUNT(1)
+    ARG_utf8(str, 0)
+
+    xmlDocPtr doc = xmlReadMemory(*str, str.length(), NULL, "UTF-8", 0);
     if (!doc) {
-        throw err("Failed to parse XML");
+        throw JS_ERROR("Failed to parse XML");
     }
     ScopeGuard guard =  MakeGuard(xmlFreeDoc, doc);
 
     xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc);
     if (!stylesheet) {
-        throw err("Failed to parse stylesheet"); 
+        throw JS_ERROR("Failed to parse stylesheet"); 
     }
     guard.Dismiss();
-    return stylesheet;
-}
-
-xmlDocPtr xsltTransform(xsltStylesheetPtr stylesheet, xmlDocPtr doc, const char **params) {
-    xmlDocPtr result = xsltApplyStylesheet(stylesheet, doc, params);
-    if (!result) {
-        throw err("Failed to apply stylesheet");
-    }
-    return result;
-}
-
-xmlOutputBufferPtr xmlAllocOutputBuffer() {
-    xmlOutputBufferPtr outbuf = xmlAllocOutputBuffer(xmlGetCharEncodingHandler(XML_CHAR_ENCODING_UTF8));
-    if (!outbuf) {
-        throw err("Failed to allocate XML output buffer");
-    }
-    return outbuf;
-}
+    RETURN_SCOPED(jsXsltStylesheet(stylesheet));
+END
 
 void freeArray(char **array, int size) {
     for (int i = 0; i < size; i++) {
@@ -59,49 +77,42 @@ void freeArray(char **array, int size) {
     free(array);
 }
 
-Handle<Value> transform(const Arguments& args) {
-    HandleScope scope;
+FUNCTION(transform)
+    ARG_COUNT(3)
+    ARG_obj(objStylesheet, 0)
+    ARG_obj(objDocument, 1)
+    ARG_array(array, 2)
 
-    if (args.Length() != 3) {
-        return err("Must supply at least 3 arguments");
+    EXTERNAL(xsltStylesheetPtr, stylesheet, objStylesheet, 0);
+    EXTERNAL(xmlDocPtr, document, objDocument, 0);
+
+    uint32_t arrayLen = array->Length();
+
+    if (arrayLen % 2 != 0) {
+        return JS_ERROR("Array contains an odd number of parameters");
     }
 
-    if (!args[0]->IsString() || !args[1]->IsString() || !args[2]->IsArray()) {
-        return err("Must supply 2 strings and an array");
-    }
-
-    String::Utf8Value utf8Stylesheet(args[0]);
-    String::Utf8Value utf8Xml(args[1]);
-    Local<Array> array = Array::Cast(*args[2]);
-
-    if (array->Length() % 2 != 0) {
-        return err("Array contains an odd number of parameters");
-    }
-
-    char** params = (char **)malloc(sizeof(char *) * (array->Length() + 1));
+    char** params = (char **)malloc(sizeof(char *) * (arrayLen + 1));
     if (!params) {
-        return err("Failed to allocate memory");
+        return JS_ERROR("Failed to allocate memory");
     }
     memset(params, 0, sizeof(char *) * (array->Length() + 1));
     ON_BLOCK_EXIT(freeArray, params, array->Length());
 
     for (int i = 0; i < array->Length(); i++) {
-        Local<String> param = array->Get(Number::New(i))->ToString();
+        Local<String> param = array->Get(JS_int(i))->ToString();
         params[i] = (char *)malloc(sizeof(char) * (param->Length() + 1));
         if (!params[i]) {
-            return err("Failed to allocate memory");
+            return JS_ERROR("Failed to allocate memory");
         }
         param->WriteAscii(params[i]);
     }
 
     try {
-        xsltStylesheetPtr stylesheet = xsltReadMemory(*utf8Stylesheet, utf8Stylesheet.length());
-        ON_BLOCK_EXIT(xsltFreeStylesheet, stylesheet);
-
-        xmlDocPtr docXml = xmlReadMemory(*utf8Xml, utf8Xml.length());
-        ON_BLOCK_EXIT(xmlFreeDoc, docXml);
-
-        xmlDocPtr result = xsltTransform(stylesheet, docXml, (const char **)params);
+        xmlDocPtr result = xsltApplyStylesheet(stylesheet, document, (const char **)params);
+        if (!result) {
+            throw JS_ERROR("Failed to apply stylesheet");
+        }
         ON_BLOCK_EXIT(xmlFreeDoc, result);
 
         xmlChar *doc_ptr;
@@ -109,15 +120,18 @@ Handle<Value> transform(const Arguments& args) {
         xsltSaveResultToString(&doc_ptr, &doc_len, result, stylesheet);
         ON_BLOCK_EXIT(xmlFree, doc_ptr);
 
-        return scope.Close(String::New((const char *)doc_ptr, doc_len));
+        RETURN_SCOPED(JS_str2((const char *)doc_ptr, doc_len));
     } catch (Handle<Value> err) {
         return err;
     }
-}
+END
 
 extern "C" void init(Handle<Object> target)
 {
     HandleScope scope;
 
-    target->Set(String::NewSymbol("transform"), FunctionTemplate::New(transform)->GetFunction());
+    Handle<Object> self = target;
+    BIND("readXmlString", readXmlString);
+    BIND("readXsltString", readXsltString);
+    BIND("transform", transform);
 }
