@@ -1,3 +1,0 @@
-[submodule "libxslt"]
-	path = libxslt
-	url = git://git.gnome.org/libxslt
