@@ -1,6 +1,6 @@
 {
     "name": "node_xslt",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "main": "./build/default/node_xslt",
     "engines": {
         "node": ">=0.1.93"

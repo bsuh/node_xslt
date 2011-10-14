@@ -1,5 +1,6 @@
 
 #include <v8.h>
+#include <libxml/HTMLparser.h>
 #include <libxslt/xslt.h>
 #include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
@@ -52,6 +53,17 @@ FUNCTION(readXmlString)
     RETURN_SCOPED(jsXmlDoc(doc));
 END
 
+FUNCTION(readHtmlString)
+    ARG_COUNT(1)
+    ARG_utf8(str, 0)
+
+    htmlDocPtr doc = htmlReadMemory(*str, str.length(), NULL, "UTF-8", HTML_PARSE_RECOVER);
+    if (!doc) {
+        throw JS_ERROR("Failed to parse XML");
+    }
+    RETURN_SCOPED(jsXmlDoc(doc));
+END
+
 FUNCTION(readXsltString)
     ARG_COUNT(1)
     ARG_utf8(str, 0)
@@ -64,7 +76,7 @@ FUNCTION(readXsltString)
 
     xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc);
     if (!stylesheet) {
-        throw JS_ERROR("Failed to parse stylesheet"); 
+        throw JS_ERROR("Failed to parse stylesheet");
     }
     guard.Dismiss();
     RETURN_SCOPED(jsXsltStylesheet(stylesheet));
@@ -132,6 +144,7 @@ extern "C" void init(Handle<Object> target)
 
     Handle<Object> self = target;
     BIND("readXmlString", readXmlString);
+    BIND("readHtmlString", readHtmlString);
     BIND("readXsltString", readXsltString);
     BIND("transform", transform);
 }
