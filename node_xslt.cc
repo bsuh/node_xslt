@@ -48,7 +48,7 @@ FUNCTION(readXmlString)
 
     xmlDocPtr doc = xmlReadMemory(*str, str.length(), NULL, "UTF-8", 0);
     if (!doc) {
-        throw JS_ERROR("Failed to parse XML");
+        return JS_ERROR("Failed to parse XML");
     }
     RETURN_SCOPED(jsXmlDoc(doc));
 END
@@ -59,7 +59,7 @@ FUNCTION(readHtmlString)
 
     htmlDocPtr doc = htmlReadMemory(*str, str.length(), NULL, "UTF-8", HTML_PARSE_RECOVER);
     if (!doc) {
-        throw JS_ERROR("Failed to parse XML");
+        return JS_ERROR("Failed to parse HTML");
     }
     RETURN_SCOPED(jsXmlDoc(doc));
 END
@@ -70,13 +70,13 @@ FUNCTION(readXsltString)
 
     xmlDocPtr doc = xmlReadMemory(*str, str.length(), NULL, "UTF-8", 0);
     if (!doc) {
-        throw JS_ERROR("Failed to parse XML");
+        return JS_ERROR("Failed to parse XML");
     }
     ScopeGuard guard =  MakeGuard(xmlFreeDoc, doc);
 
     xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc);
     if (!stylesheet) {
-        throw JS_ERROR("Failed to parse stylesheet");
+        return JS_ERROR("Failed to parse stylesheet");
     }
     guard.Dismiss();
     RETURN_SCOPED(jsXsltStylesheet(stylesheet));
