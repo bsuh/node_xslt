@@ -1,10 +1,24 @@
 # node_xslt
 
     xslt = require('node_xslt')
-    stylesheet = xslt.readXsltString(stylesheetString)
-    document = xslt.readXmlString(documentString)
-    xmlString = xslt.transform(stylesheet, document,
-            ['paramName', 'paramValue', 'paramName2', 5])
+    fs = require('fs')
+    
+    fs.readFile('test.xsl', function (err, xsltString) {
+        if (err) throw err;
+        stylesheet = xslt.readXsltString(xsltString);
+
+        fs.readFile('cdcatalog.xml', function (err, xmlString) {
+            doc = xslt.readXmlString(xmlString);
+            transformedString = xslt.transform(stylesheet, doc, []);
+            console.log(transformedString);
+        });
+
+        fs.readFile('cdcatalog.html', function (err, htmlString) {
+            doc = xslt.readHtmlString(htmlString);
+            transformedString = xslt.transform(stylesheet, doc, []);
+            console.log(transformedString);
+        });
+    });
 
 ## Requirements
 
