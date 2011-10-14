@@ -5,15 +5,20 @@
     
     fs.readFile('test.xsl', function (err, xsltString) {
         if (err) throw err;
+
         stylesheet = xslt.readXsltString(xsltString);
 
         fs.readFile('cdcatalog.xml', function (err, xmlString) {
+            if (err) throw err;
+
             doc = xslt.readXmlString(xmlString);
             transformedString = xslt.transform(stylesheet, doc, []);
             console.log(transformedString);
         });
 
         fs.readFile('cdcatalog.html', function (err, htmlString) {
+            ir (err) throw err;
+
             doc = xslt.readHtmlString(htmlString);
             transformedString = xslt.transform(stylesheet, doc, []);
             console.log(transformedString);
