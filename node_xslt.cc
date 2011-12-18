@@ -129,9 +129,14 @@ FUNCTION(transform)
         xmlChar *doc_ptr;
         int doc_len;
         xsltSaveResultToString(&doc_ptr, &doc_len, result, stylesheet);
-        ON_BLOCK_EXIT(xmlFree, doc_ptr);
 
-        RETURN_SCOPED(JS_str2((const char *)doc_ptr, doc_len));
+        if (doc_ptr) {
+            ON_BLOCK_EXIT(xmlFree, doc_ptr);
+
+            RETURN_SCOPED(JS_str2((const char *)doc_ptr, doc_len));
+        } else {
+            return v8::String::Empty();
+        }
     } catch (Handle<Value> err) {
         return err;
     }

@@ -2,7 +2,7 @@ import subprocess
 
 srcdir = '.'
 blddir = 'build'
-VERSION = '0.1.1'
+VERSION = '0.1.3'
 
 def set_options(opt):
     opt.tool_options('compiler_cxx')
@@ -11,6 +11,7 @@ def configure(conf):
     conf.check_tool('compiler_cxx')
     conf.check_tool('node_addon')
     conf.check(lib=['xml2', 'xslt'], uselib_store='M', mandatory=True)
+    conf.env.set_variant('Release')
 
 def build(bld):
     obj = bld.new_task_gen('cxx', 'shlib', 'node_addon')
@@ -20,5 +21,3 @@ def build(bld):
     obj.lib = ['xml2', 'xslt']
     obj.libpath = ['/usr/lib']
 
-def clean(ctx):
-    print("Cleaning nothing...")
