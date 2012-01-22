@@ -17,7 +17,7 @@ def build(bld):
     obj = bld.new_task_gen('cxx', 'shlib', 'node_addon')
     obj.target = 'node_xslt'
     obj.source = 'node_xslt.cc'
-    obj.cxxflags = subprocess.Popen(["xml2-config", "--cflags"], stdout=subprocess.PIPE).communicate()[0].strip()
+    obj.cxxflags = subprocess.Popen(["xml2-config", "--cflags"], stdout=subprocess.PIPE).communicate()[0].strip().split()
     obj.lib = ['xml2', 'xslt']
     obj.libpath = ['/usr/lib']
 
