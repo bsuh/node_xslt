@@ -27,8 +27,8 @@
 
 ## Requirements
 
-* [libxml2](http://www.xmlsoft.org/)
-* [libxslt](http://www.xmlsoft.org/)
+* [libxml2](http://www.xmlsoft.org/) (libxml2-dev package for Debian-based distros)
+* [libxslt](http://www.xmlsoft.org/) (libxslt-dev package for Debian-based distros)
 * xml2-config (Needs to be on PATH)
 * node-waf & v8.h (Both come with node)
 
