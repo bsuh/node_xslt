@@ -12,7 +12,7 @@
             if (err) throw err;
 
             doc = xslt.readXmlString(xmlString);
-            transformedString = xslt.transform(stylesheet, doc, []);
+            transformedString = xslt.transform(stylesheet, doc, ['param1Name', 'param1Value', 'param2Name', 'param2Value']);
             console.log(transformedString);
         });
 
