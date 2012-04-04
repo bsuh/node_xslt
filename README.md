@@ -1,29 +1,44 @@
 # node_xslt
 
     xslt = require('node_xslt')
-    fs = require('fs')
+
+    stylesheet = xslt.readXsltString(string);
+    // readXsltString
+    // Arguments: string containing XSLT
+    // Returns: stylesheet object
+
+    stylesheet = xslt.readXsltFile(filename);
+    // readXsltFile
+    // Arguments: filename to file containing XSLT
+    // Returns: stylesheet object
+
+    document = xslt.readXmlString(string);
+    // readXmlString
+    // Arguments: string containing XML
+    // Returns: document object
+
+    document = xslt.readXmlFile(filename);
+    // readXmlFile
+    // Arguments: filename to file containing XML
+    // Returns: document object
+
+    htmlDocument = xslt.readHtmlString(string);
+    // readHtmlString
+    // Arguments: string containing HTML
+    // Returns: document object
+
+    htmlDocument = xslt.readHtmlFile(string);
+    // readHtmlFile
+    // Arguments: filename to file containing HTML
+    // Returns: document object
     
-    fs.readFile('test.xsl', function (err, xsltString) {
-        if (err) throw err;
-
-        stylesheet = xslt.readXsltString(xsltString);
-
-        fs.readFile('cdcatalog.xml', function (err, xmlString) {
-            if (err) throw err;
-
-            doc = xslt.readXmlString(xmlString);
-            transformedString = xslt.transform(stylesheet, doc, ['param1Name', 'param1Value', 'param2Name', 'param2Value']);
-            console.log(transformedString);
-        });
-
-        fs.readFile('cdcatalog.html', function (err, htmlString) {
-            ir (err) throw err;
-
-            doc = xslt.readHtmlString(htmlString);
-            transformedString = xslt.transform(stylesheet, doc, []);
-            console.log(transformedString);
-        });
-    });
+    transformedString = xslt.transform(stylesheet, document, parameters);
+    // transform
+    // Arguments:
+    //  * stylesheet: stylesheet object
+    //  * document: document object
+    //  * parameters: an array of parameters to be passed to the stylesheet. length must be multiple of 2.
+    //        Example: ['param1Name', 'param1Value', 'param2Name', 'param2Value']
 
 ## Requirements
 
