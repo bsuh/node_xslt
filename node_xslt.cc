@@ -63,6 +63,24 @@ FUNCTION(readHtmlString)
     RETURN_SCOPED(jsXmlDoc(doc));
 END
 
+FUNCTION(readXsltFile)
+    ARG_COUNT(1)
+    ARG_utf8(str, 0)
+
+    xmlDocPtr doc = xmlReadFile(*str, "UTF-8", 0);
+    if (!doc) {
+        return JS_ERROR("Failed to parse XML");
+    }
+    ScopeGuard guard =  MakeGuard(xmlFreeDoc, doc);
+
+    xsltStylesheetPtr stylesheet = xsltParseStylesheetDoc(doc);
+    if (!stylesheet) {
+        return JS_ERROR("Failed to parse stylesheet");
+    }
+    guard.Dismiss();
+    RETURN_SCOPED(jsXsltStylesheet(stylesheet));
+END
+
 FUNCTION(readXsltString)
     ARG_COUNT(1)
     ARG_utf8(str, 0)
@@ -150,5 +168,6 @@ extern "C" void init(Handle<Object> target)
     BIND("readXmlString", readXmlString);
     BIND("readHtmlString", readHtmlString);
     BIND("readXsltString", readXsltString);
+    BIND("readXsltFile", readXsltFile);
     BIND("transform", transform);
 }
