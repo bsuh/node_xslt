@@ -2,7 +2,6 @@ import subprocess
 
 srcdir = '.'
 blddir = 'build'
-VERSION = '0.1.5'
 
 def set_options(opt):
     opt.tool_options('compiler_cxx')
