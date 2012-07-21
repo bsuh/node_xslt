@@ -9,7 +9,7 @@ def set_options(opt):
 def configure(conf):
     conf.check_tool('compiler_cxx')
     conf.check_tool('node_addon')
-    conf.check(lib=['xml2', 'xslt'], uselib_store='M', mandatory=True)
+    conf.check(lib=['xml2', 'xslt', 'exslt'], uselib_store='M', mandatory=True)
     conf.env.set_variant('Release')
 
 def build(bld):
@@ -17,6 +17,6 @@ def build(bld):
     obj.target = 'node_xslt'
     obj.source = 'node_xslt.cc'
     obj.cxxflags = subprocess.Popen(["xml2-config", "--cflags"], stdout=subprocess.PIPE).communicate()[0].strip().split()
-    obj.lib = ['xml2', 'xslt']
+    obj.lib = ['xml2', 'xslt', 'exslt']
     obj.libpath = ['/usr/lib']
 

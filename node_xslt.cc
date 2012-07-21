@@ -1,9 +1,9 @@
 #include <v8.h>
 #include <libxml/HTMLparser.h>
 #include <libxslt/xslt.h>
-#include <libxslt/xsltInternals.h>
 #include <libxslt/transform.h>
 #include <libxslt/xsltutils.h>
+#include <libexslt/exslt.h>
 #include <string.h>
 #include "macros.h"
 #include "scopeguard.h"
@@ -186,6 +186,8 @@ extern "C" void init(Handle<Object> target)
 {
     HandleScope scope;
 
+    exsltRegisterAll();
+ 
     Handle<Object> self = target;
     BIND("readXmlString", readXmlString);
     BIND("readXmlFile", readXmlFile);
