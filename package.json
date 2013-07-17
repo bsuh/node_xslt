@@ -1,6 +1,6 @@
 {
     "name": "node_xslt",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "main": "./build/Release/node_xslt",
     "engines": {
         "node": ">=0.1.93"
@@ -8,7 +8,7 @@
     "dependencies": {
     },
     "scripts": {
-        "preinstall": "node-waf distclean || (exit 0); node-waf configure build"
+        "preinstall": "node-gyp rebuild"
     },
     "description": "A simple XSLT package for node.js",
     "author": "Brian Suh <brian.j.suh@gmail.com>",

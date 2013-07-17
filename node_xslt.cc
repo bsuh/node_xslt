@@ -1,3 +1,4 @@
+#include <node.h>
 #include <v8.h>
 #include <libxml/HTMLparser.h>
 #include <libxslt/xslt.h>
@@ -197,3 +198,5 @@ extern "C" void init(Handle<Object> target)
     BIND("readXsltFile", readXsltFile);
     BIND("transform", transform);
 }
+
+NODE_MODULE(node_xslt, init)
