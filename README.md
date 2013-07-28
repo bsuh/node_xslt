@@ -46,7 +46,6 @@
 * [libxslt](http://xmlsoft.org/xslt/index.html) (libxslt-dev package for Debian-based distros)
 * [libexslt](http://xmlsoft.org/xslt/EXSLT/) (libxslt-dev package for Debian-based distros)
 * xml2-config (Needs to be on PATH)
-* node-waf & v8.h (Both come with node)
 
 ## Installation
 
@@ -56,5 +55,5 @@
 
 **source**
 
-    In the root directory, run `node-waf configure build` to generate
-    ./build/default/node_xslt.node
+    In the root directory, run `node-gyp rebuild` to generate
+    ./build/Release/node_xslt.node
