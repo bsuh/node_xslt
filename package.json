@@ -12,10 +12,10 @@
     },
     "description": "A simple XSLT package for node.js",
     "author": "Brian Suh <brian.j.suh@gmail.com>",
-    "homepage": "https://github.com/bahblah/node_xslt",
+    "homepage": "https://github.com/bsuh/node_xslt",
     "repository":
     {
         "type": "git",
-        "url": "git://github.com/bahblah/node_xslt.git"
+        "url": "git://github.com/bsuh/node_xslt.git"
     }
 }
