@@ -39,6 +39,9 @@
     //  * document: document object
     //  * parameters: an array of parameters to be passed to the stylesheet. length must be multiple of 2.
     //        Example: ['param1Name', 'param1Value', 'param2Name', 'param2Value']
+    //
+    //  To pass string parameters, you have to quote them so that they will be XPath constant values.
+    //        Example: xslt.transform(template, document, ['param1Name', "'value1Value'"])
 
 ## Requirements
 
