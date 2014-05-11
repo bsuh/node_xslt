@@ -55,7 +55,12 @@ FUNCTION(readXmlFile)
     ARG_COUNT(1)
     ARG_utf8(str, 0)
 
-    xmlDocPtr doc = xmlReadFile(*str, "UTF-8", 0);
+    xmlDocPtr doc = xmlReadFile(
+        *str, 
+        "UTF-8", 
+        useErrors->BooleanValue() 
+            ? XML_PARSE_RECOVER | XML_PARSE_NOERROR
+            : 0);
     if (!doc) {
         return JS_ERROR("Failed to parse XML");
     }
@@ -66,7 +71,14 @@ FUNCTION(readXmlString)
     ARG_COUNT(1)
     ARG_utf8(str, 0)
 
-    xmlDocPtr doc = xmlReadMemory(*str, str.length(), NULL, "UTF-8", 0);
+    xmlDocPtr doc = xmlReadMemory(
+        *str, 
+        str.length(), 
+        NULL, 
+        "UTF-8", 
+        useErrors->BooleanValue()
+            ? XML_PARSE_RECOVER | XML_PARSE_NOERROR
+            : 0);
     if (!doc) {
         return JS_ERROR("Failed to parse XML");
     }
@@ -78,11 +90,11 @@ FUNCTION(readHtmlFile)
     ARG_utf8(str, 0)
 
     htmlDocPtr doc = htmlReadFile(
-      *str, 
-      "UTF-8", 
-      useErrors->BooleanValue() 
-        ? HTML_PARSE_RECOVER | HTML_PARSE_NOERROR
-        : HTML_PARSE_RECOVER
+        *str, 
+        "UTF-8", 
+        useErrors->BooleanValue() 
+            ? HTML_PARSE_RECOVER | HTML_PARSE_NOERROR
+            : HTML_PARSE_RECOVER
     );
 
     if (!doc) {
@@ -96,13 +108,13 @@ FUNCTION(readHtmlString)
     ARG_utf8(str, 0)
 
     htmlDocPtr doc = htmlReadMemory(
-      *str, 
-      str.length(), 
-      NULL, 
-      "UTF-8", 
-      useErrors->BooleanValue()
-        ? HTML_PARSE_RECOVER | HTML_PARSE_NOERROR
-        : HTML_PARSE_RECOVER
+        *str, 
+        str.length(), 
+        NULL, 
+        "UTF-8", 
+        useErrors->BooleanValue()
+            ? HTML_PARSE_RECOVER | HTML_PARSE_NOERROR
+            : HTML_PARSE_RECOVER
     );
     
     if (!doc) {
