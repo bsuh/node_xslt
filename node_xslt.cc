@@ -14,6 +14,8 @@
 
 using namespace v8;
 
+Handle<Value> useErrors = v8::Boolean::New(false);
+
 void jsXmlDocCleanup(Persistent<Value> value, void *) {
     HandleScope handlescope;
     Local<Object> obj = value->ToObject();
@@ -42,11 +44,23 @@ OBJECT(jsXsltStylesheet, 1, xsltStylesheetPtr style)
     RETURN_SCOPED(self);
 END
 
+FUNCTION(useInternalErrors)
+  ARG_COUNT(0)
+
+  useErrors = v8::Boolean::New(true);
+  return v8::Boolean::New(true);
+END
+
 FUNCTION(readXmlFile)
     ARG_COUNT(1)
     ARG_utf8(str, 0)
 
-    xmlDocPtr doc = xmlReadFile(*str, "UTF-8", 0);
+    xmlDocPtr doc = xmlReadFile(
+        *str, 
+        "UTF-8", 
+        useErrors->BooleanValue() 
+            ? XML_PARSE_RECOVER | XML_PARSE_NOERROR
+            : 0);
     if (!doc) {
         return JS_ERROR("Failed to parse XML");
     }
@@ -57,7 +71,14 @@ FUNCTION(readXmlString)
     ARG_COUNT(1)
     ARG_utf8(str, 0)
 
-    xmlDocPtr doc = xmlReadMemory(*str, str.length(), NULL, "UTF-8", 0);
+    xmlDocPtr doc = xmlReadMemory(
+        *str, 
+        str.length(), 
+        NULL, 
+        "UTF-8", 
+        useErrors->BooleanValue()
+            ? XML_PARSE_RECOVER | XML_PARSE_NOERROR
+            : 0);
     if (!doc) {
         return JS_ERROR("Failed to parse XML");
     }
@@ -68,7 +89,14 @@ FUNCTION(readHtmlFile)
     ARG_COUNT(1)
     ARG_utf8(str, 0)
 
-    htmlDocPtr doc = htmlReadFile(*str, "UTF-8", HTML_PARSE_RECOVER);
+    htmlDocPtr doc = htmlReadFile(
+        *str, 
+        "UTF-8", 
+        useErrors->BooleanValue() 
+            ? HTML_PARSE_RECOVER | HTML_PARSE_NOERROR
+            : HTML_PARSE_RECOVER
+    );
+
     if (!doc) {
         return JS_ERROR("Failed to parse HTML");
     }
@@ -79,7 +107,16 @@ FUNCTION(readHtmlString)
     ARG_COUNT(1)
     ARG_utf8(str, 0)
 
-    htmlDocPtr doc = htmlReadMemory(*str, str.length(), NULL, "UTF-8", HTML_PARSE_RECOVER);
+    htmlDocPtr doc = htmlReadMemory(
+        *str, 
+        str.length(), 
+        NULL, 
+        "UTF-8", 
+        useErrors->BooleanValue()
+            ? HTML_PARSE_RECOVER | HTML_PARSE_NOERROR
+            : HTML_PARSE_RECOVER
+    );
+    
     if (!doc) {
         return JS_ERROR("Failed to parse HTML");
     }
@@ -190,6 +227,7 @@ extern "C" void init(Handle<Object> target)
     exsltRegisterAll();
  
     Handle<Object> self = target;
+    BIND("useInternalErrors", useInternalErrors);
     BIND("readXmlString", readXmlString);
     BIND("readXmlFile", readXmlFile);
     BIND("readHtmlString", readHtmlString);
