@@ -2,8 +2,8 @@
     "targets": [{
         "target_name": "node_xslt",
         "sources": [ "node_xslt.cc" ],
-        "cflags": ["<!(xml2-config --cflags)", "-fexceptions"],
-        "cflags_cc": ["<!(xml2-config --cflags)", "-fexceptions"],
+        "cflags": ["<!(xml2-config --cflags)", "-fexceptions -w"],
+        "cflags_cc": ["<!(xml2-config --cflags)", "-fexceptions -w"],
         "xcode_settings": {
             "OTHER_CFLAGS": ["<!(xml2-config --cflags)", "-fexceptions"]
         },
