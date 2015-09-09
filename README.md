@@ -34,7 +34,7 @@ var xslt = require('node_xslt')
 
 
 ### Example
-```
+```JS
 xslt.transform(
   stylesheet,
   document,
