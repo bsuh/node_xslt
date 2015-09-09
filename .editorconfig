@@ -1,7 +1,7 @@
 # http://editorconfig.org
 root = true
 
-[package.json]
+[{package.json,README.md}]
 indent_size = 2
 indent_style = space
 end_of_line = lf

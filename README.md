@@ -1,47 +1,19 @@
 # node_xslt
 
-    xslt = require('node_xslt')
+## Installation
+```
+npm install node_xslt --save
+```
 
-    stylesheet = xslt.readXsltString(string);
-    // readXsltString
-    // Arguments: string containing XSLT
-    // Returns: stylesheet object
+**Or:**
 
-    stylesheet = xslt.readXsltFile(filename);
-    // readXsltFile
-    // Arguments: filename to file containing XSLT
-    // Returns: stylesheet object
+In the root directory, run `node-gyp rebuild` to generate `./build/Release/node_xslt.node`
 
-    document = xslt.readXmlString(string);
-    // readXmlString
-    // Arguments: string containing XML
-    // Returns: document object
+Then:
 
-    document = xslt.readXmlFile(filename);
-    // readXmlFile
-    // Arguments: filename to file containing XML
-    // Returns: document object
-
-    htmlDocument = xslt.readHtmlString(string);
-    // readHtmlString
-    // Arguments: string containing HTML
-    // Returns: document object
-
-    htmlDocument = xslt.readHtmlFile(string);
-    // readHtmlFile
-    // Arguments: filename to file containing HTML
-    // Returns: document object
-    
-    transformedString = xslt.transform(stylesheet, document, parameters);
-    // transform
-    // Arguments:
-    //  * stylesheet: stylesheet object
-    //  * document: document object
-    //  * parameters: an array of parameters to be passed to the stylesheet. length must be multiple of 2.
-    //        Example: ['param1Name', 'param1Value', 'param2Name', 'param2Value']
-    //
-    //  To pass string parameters, you have to quote them so that they will be XPath constant values.
-    //        Example: xslt.transform(template, document, ['param1Name', "'value1Value'"])
+```JS
+var xslt = require('node_xslt')
+```
 
 ## Requirements
 
@@ -50,13 +22,27 @@
 * [libexslt](http://xmlsoft.org/xslt/EXSLT/) (libxslt-dev package for Debian-based distros)
 * xml2-config (Needs to be on PATH)
 
-## Installation
+## API
 
-**npm**
+| Method | Arguments | Return | Description
+| :---: | :---: | :---: | ---
+| `readXsltString` | `string` | `Stylesheet {}` | Uses the specified XSLT for transformation
+| `readXsltFile` | `string` | `Stylesheet {}` | Loads the XSLT from file
+| `readXmlString`, `readHtmlString` | `string` | `Document {}` | Imports XML/HTML from string
+| `readXmlFile`, `readHtmlFile` | string | `Document {}` | Imports the XML/HTML file
+| `transform` | `Stylesheet`, `Document`, `string[]` | **string** | Transforms the document
 
-    npm install node_xslt
 
-**source**
-
-    In the root directory, run `node-gyp rebuild` to generate
-    ./build/Release/node_xslt.node
+### Example
+```
+xslt.transform(
+  stylesheet,
+  document,
+  [
+    'paramName',
+    'paramValue',
+    'paramName',
+    'paramValue'
+  ]
+)
+```
